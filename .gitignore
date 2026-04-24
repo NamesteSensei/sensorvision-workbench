@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+backend/.venv/
+.env
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# App data
+backend/data/inputs/*
+backend/data/outputs/*
+backend/data/previews/*
+backend/data/temp/*
+backend/data/job_records/*
+
+# Keep folder structure
+!backend/data/inputs/.gitkeep
+!backend/data/outputs/.gitkeep
+!backend/data/previews/.gitkeep
+!backend/data/temp/.gitkeep
+!backend/data/job_records/.gitkeep
+
+# OS/editor
+.DS_Store
+Thumbs.db
