@@ -2,16 +2,11 @@ import { Link, Outlet } from "react-router-dom";
 
 export default function AppShell() {
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
-      <aside
-        style={{
-          width: "240px",
-          padding: "1rem",
-          borderRight: "1px solid #ddd",
-        }}
-      >
+    <div className="app-shell">
+      <aside className="sidebar">
         <h2>SensorVision</h2>
-        <nav style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+
+        <nav className="sidebar-nav">
           <Link to="/">Dashboard</Link>
           <Link to="/image-processing">Image Processing</Link>
           <Link to="/signal-analysis">Signal Analysis</Link>
@@ -22,7 +17,7 @@ export default function AppShell() {
         </nav>
       </aside>
 
-      <main style={{ flex: 1, padding: "1.5rem" }}>
+      <main className="main-content">
         <Outlet />
       </main>
     </div>
