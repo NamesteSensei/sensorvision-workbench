@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.routes.files import router as files_router
 from app.api.routes.health import router as health_router
 from app.api.routes.image_processing import router as image_processing_router
+from app.api.routes.signal_analysis import router as signal_analysis_router
 from app.api.routes.uploads import router as uploads_router
 from app.core.config import settings
 
@@ -26,6 +27,7 @@ app.include_router(health_router)
 app.include_router(uploads_router)
 app.include_router(files_router)
 app.include_router(image_processing_router)
+app.include_router(signal_analysis_router)
 
 
 @app.get("/")
