@@ -11,6 +11,7 @@ from app.schemas.video_tracking import (
     VideoTrackingResponse,
 )
 from app.services.file_service import FileService
+from app.services.job_history_service import JobHistoryService
 from app.services.storage_service import StorageService
 from app.services.yolo_service import YoloService
 
@@ -23,6 +24,7 @@ class VideoTrackingService:
         self.file_service = FileService()
         self.storage_service = StorageService()
         self.yolo_service = YoloService()
+        self.job_history_service = JobHistoryService()
 
     async def track_uploaded_video(
         self,
@@ -56,6 +58,25 @@ class VideoTrackingService:
             height=video_metadata["height"],
         )
 
+        processed_video_url = self.storage_service.build_file_url(output_path)
+
+        self.job_history_service.save_job_record(
+            job_id=upload_response.job_id,
+            job_type="video",
+            original_file_name=upload_response.original_file_name,
+            output_file_name=processed_file_name,
+            output_url=processed_video_url,
+            summary={
+                "model_name": options.model_name,
+                "tracker_name": options.tracker_name.value,
+                "confidence_threshold": options.confidence_threshold,
+                "frame_count": video_metadata["frame_count"],
+                "fps": video_metadata["fps"],
+                "unique_track_count": tracking_metrics["unique_track_count"],
+                "class_counts": tracking_metrics["class_counts"],
+            },
+        )
+
         return VideoTrackingResponse(
             job_id=upload_response.job_id,
             original_file_name=upload_response.original_file_name,
@@ -69,9 +90,7 @@ class VideoTrackingService:
             fps=video_metadata["fps"],
             unique_track_count=tracking_metrics["unique_track_count"],
             class_counts=tracking_metrics["class_counts"],
-            processed_video_url=self.storage_service.build_file_url(
-                output_path,
-            ),
+            processed_video_url=processed_video_url,
             file_size_bytes=upload_response.file_size_bytes,
             message="Video tracking completed successfully.",
         )

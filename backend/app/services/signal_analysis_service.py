@@ -18,6 +18,7 @@ from app.schemas.signal_analysis import (
     SignalAnalysisResponse,
 )
 from app.services.file_service import FileService
+from app.services.job_history_service import JobHistoryService
 from app.services.storage_service import StorageService
 
 
@@ -28,6 +29,7 @@ class SignalAnalysisService:
         """Initialize signal analysis service dependencies."""
         self.file_service = FileService()
         self.storage_service = StorageService()
+        self.job_history_service = JobHistoryService()
 
     async def analyze_uploaded_signal(
         self,
@@ -82,6 +84,27 @@ class SignalAnalysisService:
             output_path=frequency_plot_path,
         )
 
+        time_plot_url = self.storage_service.build_file_url(time_plot_path)
+        frequency_plot_url = self.storage_service.build_file_url(
+            frequency_plot_path,
+        )
+
+        self.job_history_service.save_job_record(
+            job_id=upload_response.job_id,
+            job_type="signal",
+            original_file_name=upload_response.original_file_name,
+            output_file_name=frequency_plot_path.name,
+            output_url=frequency_plot_url,
+            summary={
+                "selected_column": options.selected_column,
+                "sample_count": len(signal_values),
+                "sampling_rate_hz": options.sampling_rate_hz,
+                "smoothing_window": options.smoothing_window,
+                "time_plot_url": time_plot_url,
+                "frequency_plot_url": frequency_plot_url,
+            },
+        )
+
         return SignalAnalysisResponse(
             job_id=upload_response.job_id,
             original_file_name=upload_response.original_file_name,
@@ -91,10 +114,8 @@ class SignalAnalysisService:
             sample_count=len(signal_values),
             sampling_rate_hz=options.sampling_rate_hz,
             smoothing_window=options.smoothing_window,
-            time_plot_url=self.storage_service.build_file_url(time_plot_path),
-            frequency_plot_url=self.storage_service.build_file_url(
-                frequency_plot_path,
-            ),
+            time_plot_url=time_plot_url,
+            frequency_plot_url=frequency_plot_url,
             file_size_bytes=upload_response.file_size_bytes,
             message="Signal analysis completed successfully.",
         )

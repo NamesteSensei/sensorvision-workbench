@@ -1,7 +1,5 @@
 """Image processing service using OpenCV."""
 
-from pathlib import Path
-
 import cv2
 from fastapi import HTTPException, UploadFile, status
 
@@ -12,6 +10,7 @@ from app.schemas.image_processing import (
     ImageProcessingResponse,
 )
 from app.services.file_service import FileService
+from app.services.job_history_service import JobHistoryService
 from app.services.storage_service import StorageService
 
 
@@ -22,6 +21,7 @@ class ImageProcessingService:
         """Initialize image processing service dependencies."""
         self.file_service = FileService()
         self.storage_service = StorageService()
+        self.job_history_service = JobHistoryService()
 
     async def process_uploaded_image(
         self,
@@ -63,6 +63,20 @@ class ImageProcessingService:
                 detail="Failed to save processed image.",
             )
 
+        processed_image_url = self.storage_service.build_file_url(output_path)
+
+        self.job_history_service.save_job_record(
+            job_id=upload_response.job_id,
+            job_type="image",
+            original_file_name=upload_response.original_file_name,
+            output_file_name=processed_file_name,
+            output_url=processed_image_url,
+            summary={
+                "filter_name": options.filter_name.value,
+                "file_size_bytes": upload_response.file_size_bytes,
+            },
+        )
+
         return ImageProcessingResponse(
             job_id=upload_response.job_id,
             original_file_name=upload_response.original_file_name,
@@ -70,7 +84,7 @@ class ImageProcessingService:
             processed_file_name=processed_file_name,
             file_category="image",
             filter_name=options.filter_name,
-            processed_image_url=self.storage_service.build_file_url(output_path),
+            processed_image_url=processed_image_url,
             file_size_bytes=upload_response.file_size_bytes,
             message="Image processed successfully.",
         )

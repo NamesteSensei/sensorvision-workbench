@@ -9,6 +9,7 @@ from app.schemas.aerial_analysis import (
     AerialAnalysisResponse,
 )
 from app.services.file_service import FileService
+from app.services.job_history_service import JobHistoryService
 from app.services.storage_service import StorageService
 from app.services.yolo_service import YoloService
 
@@ -21,6 +22,7 @@ class AerialAnalysisService:
         self.file_service = FileService()
         self.storage_service = StorageService()
         self.yolo_service = YoloService()
+        self.job_history_service = JobHistoryService()
 
     async def analyze_uploaded_aerial_image(
         self,
@@ -79,6 +81,22 @@ class AerialAnalysisService:
                 detail="Failed to save aerial analysis image.",
             )
 
+        processed_image_url = self.storage_service.build_file_url(output_path)
+
+        self.job_history_service.save_job_record(
+            job_id=upload_response.job_id,
+            job_type="aerial",
+            original_file_name=upload_response.original_file_name,
+            output_file_name=processed_file_name,
+            output_url=processed_image_url,
+            summary={
+                "model_name": options.model_name,
+                "confidence_threshold": options.confidence_threshold,
+                "detected_object_count": detected_object_count,
+                "class_counts": class_counts,
+            },
+        )
+
         return AerialAnalysisResponse(
             job_id=upload_response.job_id,
             original_file_name=upload_response.original_file_name,
@@ -89,9 +107,7 @@ class AerialAnalysisService:
             confidence_threshold=options.confidence_threshold,
             detected_object_count=detected_object_count,
             class_counts=class_counts,
-            processed_image_url=self.storage_service.build_file_url(
-                output_path,
-            ),
+            processed_image_url=processed_image_url,
             file_size_bytes=upload_response.file_size_bytes,
             message="Aerial image analysis completed successfully.",
         )

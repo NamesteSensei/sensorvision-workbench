@@ -7,6 +7,7 @@ from app.api.routes.aerial_analysis import router as aerial_analysis_router
 from app.api.routes.files import router as files_router
 from app.api.routes.health import router as health_router
 from app.api.routes.image_processing import router as image_processing_router
+from app.api.routes.job_history import router as job_history_router
 from app.api.routes.signal_analysis import router as signal_analysis_router
 from app.api.routes.uploads import router as uploads_router
 from app.api.routes.video_tracking import router as video_tracking_router
@@ -32,6 +33,7 @@ app.include_router(image_processing_router)
 app.include_router(signal_analysis_router)
 app.include_router(video_tracking_router)
 app.include_router(aerial_analysis_router)
+app.include_router(job_history_router)
 
 
 @app.get("/")
