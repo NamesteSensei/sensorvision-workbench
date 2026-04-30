@@ -83,3 +83,60 @@ a:hover {
   flex: 1;
   padding: 2rem;
 }
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.metric-card {
+  padding: 1rem;
+  border-radius: 10px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 8%);
+}
+
+.metric-card h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #4b5563;
+}
+
+.metric-card p {
+  margin: 0.75rem 0 0;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #111827;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  background: white;
+}
+
+.data-table th,
+.data-table td {
+  border: 1px solid #e5e7eb;
+  padding: 0.75rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.data-table th {
+  background: #f3f4f6;
+}
+
+.summary-preview {
+  max-width: 360px;
+  max-height: 180px;
+  overflow: auto;
+  padding: 0.75rem;
+  background: #f9fafb;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
