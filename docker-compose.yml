@@ -1,0 +1,20 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: sensorvision-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/data:/app/data
+    environment:
+      - FRONTEND_ORIGIN=http://localhost:5173
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: sensorvision-frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
