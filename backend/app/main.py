@@ -9,6 +9,7 @@ from app.api.routes.health import router as health_router
 from app.api.routes.image_processing import router as image_processing_router
 from app.api.routes.job_history import router as job_history_router
 from app.api.routes.signal_analysis import router as signal_analysis_router
+from app.api.routes.system_info import router as system_info_router
 from app.api.routes.uploads import router as uploads_router
 from app.api.routes.video_tracking import router as video_tracking_router
 from app.core.config import settings
@@ -20,7 +21,11 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.frontend_origin],
+    allow_origins=[
+        settings.frontend_origin,
+        "http://localhost:5174",
+        "http://127.0.0.1:5174",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -34,6 +39,7 @@ app.include_router(signal_analysis_router)
 app.include_router(video_tracking_router)
 app.include_router(aerial_analysis_router)
 app.include_router(job_history_router)
+app.include_router(system_info_router)
 
 
 @app.get("/")
