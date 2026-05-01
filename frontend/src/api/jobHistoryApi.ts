@@ -17,3 +17,15 @@ export async function getJobHistory(): Promise<JobHistoryResponse> {
 
   return response.data;
 }
+
+export async function resetJobHistory(): Promise<void> {
+  await axiosClient.delete("/api/v1/jobs/reset");
+}
+
+export async function exportJobHistory(): Promise<Record<string, unknown>> {
+  const response = await axiosClient.get<Record<string, unknown>>(
+    "/api/v1/jobs/export",
+  );
+
+  return response.data;
+}

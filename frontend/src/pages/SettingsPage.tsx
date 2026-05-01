@@ -70,7 +70,7 @@ export default function SettingsPage() {
                   <th>API Docs</th>
                   <td>
                     <a
-                      href="http://127.0.0.1:8001/docs"
+                      href={systemInfo.api_docs_url}
                       target="_blank"
                       rel="noreferrer"
                     >

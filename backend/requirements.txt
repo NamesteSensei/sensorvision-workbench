@@ -3,11 +3,11 @@ uvicorn[standard]
 python-multipart
 pydantic
 pydantic-settings
-opencv-python
+opencv-python-headless
 numpy
 scipy
 pandas
 matplotlib
 scikit-learn
-ultralytics
 python-dotenv
+ultralytics

@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 
-import { getJobHistory } from "../api/jobHistoryApi";
+import {
+  exportJobHistory,
+  getJobHistory,
+  resetJobHistory,
+} from "../api/jobHistoryApi";
 import type { JobHistoryRecord } from "../types/jobHistoryTypes";
 import { buildBackendFileUrl } from "../utils/fileUrlHelpers";
 
@@ -9,18 +13,58 @@ export default function ResultsHistoryPage() {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  useEffect(() => {
-    async function loadJobHistory() {
-      try {
-        const response = await getJobHistory();
-        setJobs(response.jobs);
-      } catch (error) {
-        setErrorMessage("Could not load job history.");
-      } finally {
-        setIsLoading(false);
-      }
+  async function loadJobHistory() {
+    setIsLoading(true);
+    setErrorMessage("");
+
+    try {
+      const response = await getJobHistory();
+      setJobs(response.jobs);
+    } catch (error) {
+      setErrorMessage("Could not load job history.");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function handleResetHistory() {
+    const shouldReset = window.confirm(
+      "Are you sure you want to clear all job history records?",
+    );
+
+    if (!shouldReset) {
+      return;
     }
 
+    try {
+      await resetJobHistory();
+      await loadJobHistory();
+    } catch (error) {
+      setErrorMessage("Could not reset job history.");
+    }
+  }
+
+  async function handleExportHistory() {
+    try {
+      const historyExport = await exportJobHistory();
+      const blob = new Blob([JSON.stringify(historyExport, null, 2)], {
+        type: "application/json",
+      });
+
+      const downloadUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+
+      link.href = downloadUrl;
+      link.download = "sensorvision-job-history.json";
+      link.click();
+
+      URL.revokeObjectURL(downloadUrl);
+    } catch (error) {
+      setErrorMessage("Could not export job history.");
+    }
+  }
+
+  useEffect(() => {
     loadJobHistory();
   }, []);
 
@@ -31,6 +75,20 @@ export default function ResultsHistoryPage() {
         Review previously processed images, signals, videos, and aerial analysis
         outputs.
       </p>
+
+      <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
+        <button type="button" onClick={loadJobHistory}>
+          Reload History
+        </button>
+
+        <button type="button" onClick={handleExportHistory}>
+          Export History JSON
+        </button>
+
+        <button type="button" onClick={handleResetHistory}>
+          Reset Dashboard
+        </button>
+      </div>
 
       {errorMessage && (
         <p style={{ color: "red", marginTop: "1rem" }}>{errorMessage}</p>

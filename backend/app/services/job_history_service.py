@@ -60,6 +60,29 @@ class JobHistoryService:
         )
         return JobHistoryResponse(jobs=sorted_records)
 
+    def export_job_records(self) -> dict[str, Any]:
+        """Export all job records as a JSON-compatible dictionary."""
+        records = self.list_job_records().jobs
+
+        return {
+            "exported_at": datetime.now(timezone.utc).isoformat(),
+            "job_count": len(records),
+            "jobs": [record.model_dump() for record in records],
+        }
+
+    def reset_job_records(self) -> dict[str, str | int]:
+        """Delete all saved job history records."""
+        deleted_count = 0
+
+        for record_path in JOB_RECORDS_DIR.glob("*.json"):
+            record_path.unlink()
+            deleted_count += 1
+
+        return {
+            "message": "Job history reset successfully.",
+            "deleted_records": deleted_count,
+        }
+
     def get_dashboard_summary(self) -> DashboardSummaryResponse:
         """Return dashboard summary metrics."""
         records = self._load_all_records()
